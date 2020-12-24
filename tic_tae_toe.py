@@ -82,8 +82,9 @@ class tic_tac_toe():
                 current_state.append(x[j])
         return current_state
         
-    def play(self, board):
+    def play(self, board, game):
         #Player one
+        game = game
         print(board)
         x,y = map(int,input("Human's turn! ").split(' '))
         if board[(x,y)] !=0 :
@@ -92,33 +93,44 @@ class tic_tac_toe():
         else:
             board[(x,y)] = 1
         
+        c_s = self.state_reg(board)
+        self.state.append(c_s)
+        
         state_reward, point = self.elvaluate(board, 1)
         if point != 0:
             print("player 1: "+str(state_reward))
-            return 0
-        
-        c_s = self.state_reg(board)
-        self.state.append(c_s)
+            print(self.state)
+            s = self.state
+            return s
     
         possible_play = self.check_board(board)
-        if possible_play == 0:
-            print(self.state)
-            return 0
         #player two
         selection = random.choice(possible_play)
         board[selection[0]][selection[1]] = 2
         
-        state_reward, point = self.elvaluate(board, 2)
-        if point != 0:
-            print("player 2: "+str(state_reward))
-            return 0
-        
         c_s = self.state_reg(board)
         self.state.append(c_s)
         
-        self.play(board)
+        state_reward, point = self.elvaluate(board, 2)
+        if point != 0:
+            print("player 2: "+str(state_reward))
+            print(self.state)
+            s = self.state
+            return s
+        
+        self.play(board, game)
 
-board = np.array(np.zeros([3,3], dtype='int'))
+total_games = 3
+game = 1
+data_set = {}
 c = tic_tac_toe()
-c.play(board)
+
+while game <= total_games:
+    board = np.array(np.zeros([3,3], dtype='int'))
+    game_data = c.play(board, game)
+    print(game_data)
+    data_set[game] = game_data
+    game += 1
+
+print(data_set)
 
