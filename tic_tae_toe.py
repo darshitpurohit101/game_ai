@@ -4,7 +4,7 @@ import random
 class tic_tac_toe():
     
     def __init__(self):
-        self.state = []
+        self.current_game = {}
     
     def row(self, board, player):
         
@@ -94,14 +94,14 @@ class tic_tac_toe():
             board[(x,y)] = 1
         
         c_s = self.state_reg(board)
-        self.state.append(c_s)
+        c_s = tuple(c_s)
+        self.current_game[c_s] = [0,0]
         
         state_reward, point = self.elvaluate(board, 1)
         if point != 0:
             print("player 1: "+str(state_reward))
-            print(self.state)
-            s = self.state
-            return s
+#            print(self.state)
+            return self.current_game
     
         possible_play = self.check_board(board)
         #player two
@@ -109,16 +109,16 @@ class tic_tac_toe():
         board[selection[0]][selection[1]] = 2
         
         c_s = self.state_reg(board)
-        self.state.append(c_s)
+        c_s = tuple(c_s)
+        self.current_game[c_s] = [0,0]
         
         state_reward, point = self.elvaluate(board, 2)
         if point != 0:
             print("player 2: "+str(state_reward))
-            print(self.state)
-            s = self.state
-            return s
+#            print(self.state)
+            return self.current_game
         
-        self.play(board, game)
+        return self.play(board, game)
 
 total_games = 3
 game = 1
@@ -128,9 +128,10 @@ c = tic_tac_toe()
 while game <= total_games:
     board = np.array(np.zeros([3,3], dtype='int'))
     game_data = c.play(board, game)
-    print(game_data)
+#    print(game_data)
     data_set[game] = game_data
     game += 1
+    print(data_set)
 
-print(data_set)
+
 
