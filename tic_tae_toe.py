@@ -16,8 +16,10 @@ class tic_tac_toe():
             for j in range(3):
                 if self.board[i][j] != player:
                     w = False
-            
-            return w
+            if w == True:
+    #            print("row: ",board)
+    #            print("w: ",w)
+                return w
             
     def col(self, player):
         
@@ -26,18 +28,28 @@ class tic_tac_toe():
             for j in range(3):
                 if self.board[j][i] != player:
                     w = False
-            
-            return w
+            if w == True:
+                return w
                 
-    def diag(self, player):
+    def diag(self,player):
         
         win = True
+        d1 = [[0,0],[1,1],[2,2]]
+        d1 = np.array(d1)
+        d2 = [[0,2],[1,1],[2,0]]
+        d2 = np.array(d2)
         
-        for i in range(3): 
-            if self.board[i, i] != player: 
+        for i in range(len(d1)): 
+            if self.board[d1[i,0], d1[i,1]] != player: 
                 win = False
-                
-        return(win) 
+        
+        if win == False:
+                    
+            for i in range(len(d2)): 
+                if self.board[d2[i, 0], d2[i,1]] != player: 
+                    win = False
+                     
+        return win 
         
     def reward(self, winner, p):
         
@@ -50,21 +62,20 @@ class tic_tac_toe():
         else:
             return -1
             
-    def elvaluate(self, p):
+    def elvaluate(self,p):
         
         winner = 0
         p = p
+         
+        if (self.row(p) or
+            self.col(p) or
+            self.diag(p)): 
+            winner = p
         
-        for player in [1, 2]: 
-            if (self.row(player) or
-                self.col(player) or
-                self.diag(player)): 
-                winner = player
-            
-            if np.all(self.board != 0) and winner == 0: 
-                winner = -1
+        elif np.all(board != 0) and winner == 0: 
+            winner = -1
     	
-        result = self.reward(winner, p)
+        result = self.reward(winner, 2)
         return result, winner
         
     
@@ -85,38 +96,32 @@ class tic_tac_toe():
                 current_state.append(x[j])
         return current_state
     
-    def play(self, game):
-        #Player one
-        game = game
-        print(self.board)
-        possible_play = self.check_board()
-        selection = random.choice(possible_play)
-        self.board[selection[0]][selection[1]] = 1
+    def action(self, positions, player):
         
-        c_s = self.state_reg()
-        c_s = tuple(c_s)
-        self.current_game[c_s] = [0,0]
+        selection = random.choice(positions)
+        self.board[selection[0]][selection[1]] = player
         
-        state_reward, point = self.elvaluate(1)
-        if point != 0:
-            print("player 1: "+str(state_reward))
-#            print(self.state)
-            return self.current_game
     
-        possible_play = self.check_board()
-        #player two
-        selection = random.choice(possible_play)
-        self.board[selection[0]][selection[1]] = 2
+    def play(self, game):
+        #Players [1,2]
+        game = game
+        for p in iter([1,2]):
+#            print(self.board)
+            possible_play = self.check_board()
+            self.action(possible_play, p)
+    
+            c_s = self.state_reg()
+            c_s = tuple(c_s)
+            self.current_game[c_s] = [0,0]
         
-        c_s = self.state_reg()
-        c_s = tuple(c_s)
-        self.current_game[c_s] = [0,0]
-        
-        state_reward, point = self.elvaluate(2)
-        if point != 0:
-            print("player 2: "+str(state_reward))
-#            print(self.state)
-            return self.current_game
+            state_reward, point = self.elvaluate(p)
+            if point != 0:
+                print("player 2: "+str(state_reward))
+                print(self.board)
+                #print(self.state)
+                return self.current_game
+            print(self.board)
+            print("/n")
         
         return self.play(game)
 
